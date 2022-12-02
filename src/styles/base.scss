@@ -1,5 +1,34 @@
 .main {
-  display: grid;
-  grid-template: 1fr / 1fr min-content;
-  background-color: red;
+  display: flex;
+
+  & #viewerContainer {
+    position: absolute;
+    overflow: auto;
+  }
+
+  &__preview {
+    position: relative;
+    min-width: 816px;
+  }
+
+  &__options {
+    width: 100%;
+  }
+}
+
+.options {
+  position: relative;
+  & .content {
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: 16px;
+  }
+}
+
+.options__field {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  margin-bottom: 24px;
 }
