@@ -5,7 +5,10 @@ const { NODE_ENV } = process.env;
 const isDev = NODE_ENV !== 'production';
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: {
+    main: './src/index.tsx',
+    "pdf.worker": "pdfjs-dist/build/pdf.worker.entry",
+  },
   mode: isDev ? 'development' : NODE_ENV,
   devtool: isDev ? 'source-map' : false,
   module: {
@@ -15,15 +18,26 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          "style-loader",
+          "css-loader",
+          "sass-loader",
+        ],
+      },
     ],
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(process.cwd(), 'build'),
-    publicPath: '',
+    path: path.join(process.cwd(), "build"),
+    publicPath: "",
+    filename: "[name].bundle.js",
+  },
+  optimization: {
+    runtimeChunk: 'single',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -33,6 +47,7 @@ module.exports = {
   devServer: {
     static: './build',
     port: 3000,
-    historyApiFallback: true
+    historyApiFallback: true,
+    hot: true,
   },
 };
