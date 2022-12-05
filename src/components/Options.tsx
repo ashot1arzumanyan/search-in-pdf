@@ -33,7 +33,7 @@ const Options = ({ className, options, onChange }: ComponentProps) => {
           onChange={handleChange}
         />
       ))}
-      <div>
+      <div className="options__buttonContainer">
         <button type="button">
           Save
         </button>
