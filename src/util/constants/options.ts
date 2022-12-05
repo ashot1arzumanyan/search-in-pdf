@@ -1,21 +1,18 @@
 import { Option } from '../../types/types';
 
-const options: Option[] = [
-  {
-    id: 'field_1',
-    name: 'Field 1',
-    value: '',
-  },
-  {
-    id: 'field_2',
-    name: 'Field 2',
-    value: '',
-  },
-  {
-    id: 'field_3',
-    name: 'Field 3',
-    value: '',
-  },
-];
+const getOptions = (amount: number) => {
+  const options = [] as Option[];
+  for (let i = 1; i <= amount; i += 1) {
+    const option = {
+      id: `field_${i}`,
+      name: `Field ${i}`,
+      value: '',
+    };
 
-export default options;
+    options.push(option);
+  }
+
+  return options;
+};
+
+export default getOptions(10);

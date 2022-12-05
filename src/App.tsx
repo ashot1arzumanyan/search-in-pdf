@@ -46,7 +46,7 @@ const App = () => {
             highlightAll: true,
           });
 
-          eventBus.on('pagerendered', () => {
+          setTimeout(() => {
             const selected = container.getElementsByClassName('highlight');
 
             const rects = Array.from(selected).map((s) => {
@@ -59,9 +59,7 @@ const App = () => {
               };
             });
             console.log(rects);
-            setTimeout(() => {
-            }, 2000);
-          });
+          }, 2000);
         });
 
         pdfViewer.setDocument(pdf);
