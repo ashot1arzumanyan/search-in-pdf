@@ -13,6 +13,7 @@
   "ignorePatterns": ["webpack.config.js"],
   "rules": {
     "react/function-component-definition": [2, { "namedComponents": "arrow-function" }],
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "react/no-this-in-sfc": "off"
   }
 }

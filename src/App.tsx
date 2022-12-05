@@ -1,70 +1,77 @@
 import * as pdflib from 'pdfjs-dist';
 import * as pdfjsViewer from 'pdfjs-dist/web/pdf_viewer';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import Options from './components/Options';
+import optionsExternal from './util/constants/options';
+import Uploader from './components/Uploader';
 
 pdflib.GlobalWorkerOptions.workerSrc = '../build/webpack/pdf.worker.bundle.js';
 
-const pdfPath = './pdfs/Lorem_ipsum.pdf';
-
 const App = () => {
+  const [file, setFile] = useState<Uint8Array>(null);
+  const [options, setOptions] = useState(optionsExternal);
+
   useEffect(() => {
-    const render = async () => {
-      const container = document.getElementById('viewerContainer') as HTMLDivElement;
+    if (file) {
+      const render = async () => {
+        const container = document.getElementById('viewerContainer') as HTMLDivElement;
 
-      const pdf = await pdflib.getDocument(pdfPath).promise;
+        const pdf = await pdflib.getDocument(file).promise;
 
-      const eventBus = new pdfjsViewer.EventBus();
+        const eventBus = new pdfjsViewer.EventBus();
 
-      const pdfLinkService = new pdfjsViewer.PDFLinkService({
-        eventBus,
-      });
-
-      const pdfFindController = new pdfjsViewer.PDFFindController({
-        eventBus,
-        linkService: pdfLinkService,
-      });
-
-      const pdfViewer = new pdfjsViewer.PDFViewer({
-        container,
-        eventBus,
-        linkService: pdfLinkService,
-        findController: pdfFindController,
-        l10n: new pdfjsViewer.GenericL10n('en'),
-      });
-      pdfLinkService.setViewer(pdfViewer);
-
-      eventBus.on('pagesinit', () => {
-        eventBus.dispatch('find', {
-          type: '',
-          query: 'and',
-          highlightAll: true,
+        const pdfLinkService = new pdfjsViewer.PDFLinkService({
+          eventBus,
         });
 
-        setTimeout(() => {
-          const selected = container.getElementsByClassName('highlight');
+        const pdfFindController = new pdfjsViewer.PDFFindController({
+          eventBus,
+          linkService: pdfLinkService,
+        });
 
-          const rects = Array.from(selected).map((s) => {
-            const rect = s.getBoundingClientRect();
-            return {
-              width: rect.width,
-              height: rect.height,
-              x: rect.x,
-              y: rect.y,
-            };
+        const pdfViewer = new pdfjsViewer.PDFViewer({
+          container,
+          eventBus,
+          linkService: pdfLinkService,
+          findController: pdfFindController,
+          l10n: new pdfjsViewer.GenericL10n('en'),
+        });
+        pdfLinkService.setViewer(pdfViewer);
+
+        eventBus.on('pagesinit', () => {
+          eventBus.dispatch('find', {
+            type: '',
+            query: 'and',
+            highlightAll: true,
           });
-          console.log(rects);
-        }, 2000);
-      });
 
-      pdfViewer.setDocument(pdf);
+          eventBus.on('pagerendered', () => {
+            const selected = container.getElementsByClassName('highlight');
 
-      pdfLinkService.setDocument(pdf, null);
-    };
+            const rects = Array.from(selected).map((s) => {
+              const rect = s.getBoundingClientRect();
+              return {
+                width: rect.width,
+                height: rect.height,
+                x: rect.x,
+                y: rect.y,
+              };
+            });
+            console.log(rects);
+            setTimeout(() => {
+            }, 2000);
+          });
+        });
 
-    render().catch(console.log);
-  }, []);
+        pdfViewer.setDocument(pdf);
+
+        pdfLinkService.setDocument(pdf, null);
+      };
+
+      render().catch(console.log);
+    }
+  }, [file]);
 
   return (
     <div className="main">
@@ -72,8 +79,13 @@ const App = () => {
         <div id="viewerContainer">
           <div id="viewer" className="pdfViewer" />
         </div>
+        {!file && <Uploader onLoaded={setFile} />}
       </div>
-      <Options className="main__options" />
+      <Options
+        className="main__options"
+        options={options}
+        onChange={setOptions}
+      />
     </div>
   );
 };

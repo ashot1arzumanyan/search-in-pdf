@@ -5,15 +5,22 @@ html, body {
 
 .main {
   display: flex;
+  min-height: 100vh;
+  width: 100%;
 
   & #viewerContainer {
     position: absolute;
-    overflow: auto;
+    top: 0;
+    left: 0;
   }
 
   &__preview {
     position: relative;
     min-width: 816px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
   }
 
   &__options {
@@ -23,17 +30,11 @@ html, body {
 
 .options {
   position: relative;
-  & .content {
-    position: sticky;
-    top: 0;
-    left: 0;
-    padding: 16px;
-  }
-}
-
-.options__field {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  margin-bottom: 24px;
+  width: var(--options-container-width);
+  position: fixed;
+  background-color: white;
+  opacity: .5;
+  top: 0;
+  right: 48px;
+  padding: 16px;
 }
