@@ -1,0 +1,42 @@
+.uploader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 300px;
+  height: 200px;
+  border: 2px gray dashed;
+  border-radius: 16px;
+
+  &--inactive {
+    background: lightgray;
+  }
+
+  &--active {
+    background: white;
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  &__fileInput {
+    display: none;
+  }
+
+  &__dragArea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+  }
+}

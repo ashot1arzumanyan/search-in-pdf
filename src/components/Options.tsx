@@ -1,37 +1,42 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
+import { ChangeEvent } from 'react';
+import { Option } from '../types/types';
+import TextField from './TextField';
+
 interface ComponentProps {
   className: string;
+  options: Option[];
+  onChange: (o: Option[]) => void;
 }
 
-const Options = ({ className }: ComponentProps) => {
-  console.log('opts');
+const Options = ({ className, options, onChange }: ComponentProps) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const newOptions = options.map((o) => {
+      const option = o;
+      if (option.id === name) {
+        option.value = value;
+        return option;
+      }
+      return option;
+    });
+    onChange(newOptions);
+  };
 
   return (
     <div className={`options ${className}`}>
-      <div className="content">
-        <div className="options__field">
-          <label htmlFor="field_1">
-            Field 1
-          </label>
-          <input type="text" id="field_1" />
-        </div>
-        <div className="options__field">
-          <label htmlFor="field_2">
-            Field 2
-          </label>
-          <input type="text" id="field_2" />
-        </div>
-        <div className="options__field">
-          <label htmlFor="field_3">
-            Field 3
-          </label>
-          <input type="text" id="field_3" />
-        </div>
-        <div>
-          <button type="button">
-            Save
-          </button>
-        </div>
+      {options.map((option) => (
+        <TextField
+          key={option.id}
+          id={option.id}
+          label={option.name}
+          value={option.value}
+          onChange={handleChange}
+        />
+      ))}
+      <div>
+        <button type="button">
+          Save
+        </button>
       </div>
     </div>
   );

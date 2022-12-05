@@ -1,0 +1,15 @@
+.textField {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  margin-bottom: 24px;
+
+  &__label {
+    margin-bottom: 8px;
+  }
+
+  &__input {
+    padding: 8px;
+    border-radius: 8px;
+  }
+}
