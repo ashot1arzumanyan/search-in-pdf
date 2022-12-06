@@ -6,6 +6,8 @@
   "scripts": {
     "start": "webpack serve",
     "build": "NODE_ENV=production webpack",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "lint": "eslint src"
   },
   "author": "Ashot Arzumanyan",
@@ -29,6 +31,7 @@
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "gh-pages": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
     "sass": "^1.56.1",
     "sass-loader": "^13.2.0",
