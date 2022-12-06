@@ -3,3 +3,7 @@ export interface Option {
   name: string;
   value: string;
 }
+
+export interface TextContentItem {
+  str: string;
+}

@@ -1,14 +1,23 @@
-import { ChangeEvent } from 'react';
-import { Option } from '../types/types';
+import { ChangeEvent, useMemo } from 'react';
+import { Option, TextContentItem } from '../types/types';
+import extractWords from '../util/helpers/extractWords';
 import TextField from './TextField';
 
 interface ComponentProps {
   className: string;
   options: Option[];
   onChange: (o: Option[]) => void;
+  textContentItems: TextContentItem[];
 }
 
-const Options = ({ className, options, onChange }: ComponentProps) => {
+const Options = ({
+  className,
+  options,
+  onChange,
+  textContentItems,
+}: ComponentProps) => {
+  const words = useMemo(() => extractWords(textContentItems), [textContentItems]);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const newOptions = options.map((o) => {
@@ -31,6 +40,7 @@ const Options = ({ className, options, onChange }: ComponentProps) => {
           label={option.name}
           value={option.value}
           onChange={handleChange}
+          words={words}
         />
       ))}
       <div className="options__buttonContainer">

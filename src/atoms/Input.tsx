@@ -3,6 +3,7 @@ import { ChangeEventHandler } from 'react';
 interface ComponentProps {
   className: string;
   id: string;
+  listId: string;
   value: string;
   name: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
@@ -11,6 +12,7 @@ interface ComponentProps {
 const Input = ({
   className,
   id,
+  listId,
   value,
   name,
   onChange,
@@ -18,6 +20,7 @@ const Input = ({
   <input
     className={className}
     id={id}
+    list={listId}
     name={name}
     value={value}
     onChange={onChange}
