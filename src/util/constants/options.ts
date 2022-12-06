@@ -15,4 +15,4 @@ const getOptions = (amount: number) => {
   return options;
 };
 
-export default getOptions(10);
+export default getOptions(3);

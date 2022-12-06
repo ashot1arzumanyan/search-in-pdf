@@ -8,6 +8,8 @@ import Uploader from './components/Uploader';
 
 pdflib.GlobalWorkerOptions.workerSrc = '../build/webpack/pdf.worker.bundle.js';
 
+const LANG = 'en';
+
 const App = () => {
   const [file, setFile] = useState<Uint8Array>(null);
   const [options, setOptions] = useState(optionsExternal);
@@ -35,36 +37,12 @@ const App = () => {
           eventBus,
           linkService: pdfLinkService,
           findController: pdfFindController,
-          l10n: new pdfjsViewer.GenericL10n('en'),
-        });
-        pdfLinkService.setViewer(pdfViewer);
-
-        eventBus.on('pagesinit', () => {
-          eventBus.dispatch('find', {
-            type: '',
-            query: 'and',
-            highlightAll: true,
-          });
-
-          setTimeout(() => {
-            const selected = container.getElementsByClassName('highlight');
-
-            const rects = Array.from(selected).map((s) => {
-              const rect = s.getBoundingClientRect();
-              return {
-                width: rect.width,
-                height: rect.height,
-                x: rect.x,
-                y: rect.y,
-              };
-            });
-            console.log(rects);
-          }, 2000);
+          l10n: new pdfjsViewer.GenericL10n(LANG),
         });
 
         pdfViewer.setDocument(pdf);
 
-        pdfLinkService.setDocument(pdf, null);
+        pdfLinkService.setDocument(pdf);
       };
 
       render().catch(console.log);
