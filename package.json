@@ -6,6 +6,7 @@
   "scripts": {
     "start": "webpack serve",
     "build": "NODE_ENV=production webpack",
+    "build:deploy": "npm run build && cp ./build/* ./docs",
     "lint": "eslint src"
   },
   "author": "Ashot Arzumanyan",
