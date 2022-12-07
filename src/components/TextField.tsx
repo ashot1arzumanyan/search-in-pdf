@@ -1,4 +1,4 @@
-import { ChangeEventHandler, memo } from 'react';
+import { ChangeEventHandler, memo, useRef } from 'react';
 import getDatalistId from '../util/helpers/getDatalistId';
 import highlightText from '../util/helpers/highlightText';
 import DataList from './DataList';
@@ -22,10 +22,14 @@ const TextField = ({
   words,
   saved,
 }: ComponentProps) => {
+  const selectedObj = useRef({ selected: false });
+
   const listId = getDatalistId(id);
 
   const handleMouseEnter = () => {
-    if (!saved) return;
+    if (!saved || !value || selectedObj.current.selected) return;
+    selectedObj.current.selected = true;
+
     highlightText(value.toLowerCase());
   };
 
