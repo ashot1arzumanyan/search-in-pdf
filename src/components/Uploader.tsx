@@ -10,14 +10,18 @@ interface ComponentProps {
 }
 
 const handleFile = (file: File, setLoaded: (f: Uint8Array) => void) => {
-  const filReader = new FileReader();
+  if (file.type !== 'application/pdf') {
+    alert('Sorry! only PDF files are accepted');
+  } else {
+    const filReader = new FileReader();
 
-  filReader.onload = function onload() {
-    const typedarray = new Uint8Array(this.result as ArrayBuffer);
-    setLoaded(typedarray);
-  };
+    filReader.onload = function onload() {
+      const typedarray = new Uint8Array(this.result as ArrayBuffer);
+      setLoaded(typedarray);
+    };
 
-  filReader.readAsArrayBuffer(file);
+    filReader.readAsArrayBuffer(file);
+  }
 };
 
 const Uploader = ({ onLoaded }: ComponentProps) => {
@@ -63,6 +67,7 @@ const Uploader = ({ onLoaded }: ComponentProps) => {
           className="uploader__fileInput"
           type="file"
           onChange={handleUpload}
+          accept=".pdf,application/pdf"
         />
         <p>
           Drag and Drop file here
