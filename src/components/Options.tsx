@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
 import { Option, TextContentItem } from '../types/types';
 import extractWords from '../util/helpers/extractWords';
 import TextField from './TextField';
@@ -16,6 +16,8 @@ const Options = ({
   onChange,
   textContentItems,
 }: ComponentProps) => {
+  const [saved, setSaved] = useState(false);
+
   const words = useMemo(() => extractWords(textContentItems), [textContentItems]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +33,10 @@ const Options = ({
     onChange(newOptions);
   };
 
+  const handleSave = () => {
+    setSaved(true);
+  };
+
   return (
     <div className={`options ${className}`}>
       {options.map((option) => (
@@ -41,10 +47,11 @@ const Options = ({
           value={option.value}
           onChange={handleChange}
           words={words}
+          saved={saved}
         />
       ))}
       <div className="options__buttonContainer">
-        <button type="button">
+        <button type="button" onClick={handleSave}>
           Save
         </button>
       </div>

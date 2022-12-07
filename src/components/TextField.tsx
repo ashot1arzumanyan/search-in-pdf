@@ -1,6 +1,6 @@
 import { ChangeEventHandler, memo } from 'react';
-import Input from '../atoms/Input';
 import getDatalistId from '../util/helpers/getDatalistId';
+import highlightText from '../util/helpers/highlightText';
 import DataList from './DataList';
 
 const MemoizedDataList = memo(DataList);
@@ -11,6 +11,7 @@ interface ComponentProps {
   id: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
   words: Set<string>;
+  saved: boolean;
 }
 
 const TextField = ({
@@ -19,19 +20,26 @@ const TextField = ({
   id,
   onChange,
   words,
+  saved,
 }: ComponentProps) => {
   const listId = getDatalistId(id);
+
+  const handleMouseEnter = () => {
+    if (!saved) return;
+    highlightText(value.toLowerCase());
+  };
 
   return (
     <div className="textField">
       <label className="textField__label" htmlFor={id}>{label}</label>
-      <Input
+      <input
         className="textField__input"
         id={id}
-        listId={listId}
+        list={listId}
         name={id}
         value={value}
         onChange={onChange}
+        onMouseEnter={handleMouseEnter}
       />
       <MemoizedDataList
         listId={listId}
