@@ -34,7 +34,13 @@ module.exports = {
   output: {
     path: path.join(process.cwd(), "build"),
     publicPath: "",
-    filename: "[name].bundle.js",
+    filename: (pathData) => {
+      if (pathData.chunk.name === 'pdf.worker') {
+        return '[name].bundle.js';
+      }
+      return '[name].[chunkhash].bundle.js';
+    },
+    clean: true,
   },
   optimization: {
     runtimeChunk: 'single',
