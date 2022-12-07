@@ -1,58 +1,67 @@
-interface TextNodesAndStartIndex {
-  node: Node,
-  startIndex: number
+interface Coordinate {
+  pageNum: number;
+  cords: DOMRect[];
+  text: string;
 }
 
 const highlightText = (text: string) => {
   const container = document.getElementById('viewerContainer');
-  const textLayers = container.querySelectorAll('.textLayer');
-  const textNodeAndStartIndexes = [] as TextNodesAndStartIndex[];
-  textLayers.forEach((el) => {
-    const walker = document.createTreeWalker(
-      el,
-      NodeFilter.SHOW_TEXT,
-      (node) => (node.nodeType === Node.TEXT_NODE
-        ? NodeFilter.FILTER_ACCEPT
-        : NodeFilter.FILTER_ACCEPT),
-    );
+  const pages = container.querySelectorAll('.page');
 
-    let currentNode = walker.nextNode();
+  const coordinates = [] as Coordinate[];
 
-    while (currentNode) {
-      const startIndex = currentNode.textContent.toLowerCase().indexOf(text);
-      if (startIndex >= 0) {
-        textNodeAndStartIndexes.push({
-          node: currentNode,
-          startIndex,
-        });
+  pages.forEach((page) => {
+    const coordinate = { text } as Coordinate;
+
+    if (page instanceof HTMLElement) {
+      coordinate.pageNum = Number(page.dataset.pageNumber);
+
+      const walker = document.createTreeWalker(
+        page,
+        NodeFilter.SHOW_TEXT,
+        (node) => (node.nodeType === Node.TEXT_NODE
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_REJECT),
+      );
+
+      let currentNode = walker.nextNode();
+
+      while (currentNode) {
+        const startIndex = currentNode.textContent.toLowerCase().indexOf(text);
+        if (startIndex >= 0) {
+          const range = new Range();
+          range.setStart(currentNode, startIndex);
+          range.setEnd(currentNode, startIndex + text.length);
+
+          if (coordinate.cords) {
+            coordinate.cords.push(range.getBoundingClientRect());
+          } else {
+            coordinate.cords = [range.getBoundingClientRect()];
+          }
+        }
+        currentNode = walker.nextNode();
       }
-      currentNode = walker.nextNode();
+      coordinates.push(coordinate);
     }
   });
 
-  const selectionClassName = `selected--${text}`;
+  coordinates.forEach((c) => {
+    if (c.cords) {
+      c.cords.forEach((rect) => {
+        const div = document.createElement('div');
+        div.classList.add(`selector--${c.text}`);
+        div.style.background = 'red';
 
-  let style = document.head.querySelector('#selection');
-  if (!style) {
-    style = document.createElement('style');
-    style.setAttribute('id', 'selection');
-  }
+        div.style.position = 'absolute';
+        div.style.top = `${rect.top + window.scrollY}px`;
+        div.style.left = `${rect.left + window.scrollX}px`;
+        div.style.width = `${rect.width}px`;
+        div.style.height = `${rect.height}px`;
+        div.style.opacity = '.5';
 
-  style.innerHTML = `.${selectionClassName} {background: blue}`;
-
-  document.head.appendChild(style);
-
-  textNodeAndStartIndexes.forEach((textAndStartIndex) => {
-    const { node, startIndex } = textAndStartIndex;
-
-    const range = new Range();
-    range.setStart(node, startIndex);
-    range.setEnd(node, startIndex + text.length);
-
-    const wrapper = document.createElement('span');
-    wrapper.classList.add(selectionClassName);
-
-    range.surroundContents(wrapper);
+        document.body.appendChild(div);
+      });
+    }
   });
 };
 
