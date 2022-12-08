@@ -1,19 +1,19 @@
-interface TextNodesAndStartIndex {
-  node: Node,
-  startIndex: number
-}
+import createSelector from './createSelector';
+import FreezeScroll from './FreezeScroll';
 
 const highlightText = (text: string) => {
+  FreezeScroll.enable();
+
   const container = document.getElementById('viewerContainer');
-  const textLayers = container.querySelectorAll('.textLayer');
-  const textNodeAndStartIndexes = [] as TextNodesAndStartIndex[];
-  textLayers.forEach((el) => {
+  const pages = container.querySelectorAll('.page');
+
+  pages.forEach((page) => {
     const walker = document.createTreeWalker(
-      el,
+      page,
       NodeFilter.SHOW_TEXT,
       (node) => (node.nodeType === Node.TEXT_NODE
         ? NodeFilter.FILTER_ACCEPT
-        : NodeFilter.FILTER_ACCEPT),
+        : NodeFilter.FILTER_REJECT),
     );
 
     let currentNode = walker.nextNode();
@@ -21,39 +21,17 @@ const highlightText = (text: string) => {
     while (currentNode) {
       const startIndex = currentNode.textContent.toLowerCase().indexOf(text);
       if (startIndex >= 0) {
-        textNodeAndStartIndexes.push({
-          node: currentNode,
-          startIndex,
-        });
+        const range = new Range();
+        range.setStart(currentNode, startIndex);
+        range.setEnd(currentNode, startIndex + text.length);
+
+        createSelector(range.getBoundingClientRect(), text);
       }
       currentNode = walker.nextNode();
     }
   });
 
-  const selectionClassName = `selected--${text}`;
-
-  let style = document.head.querySelector('#selection');
-  if (!style) {
-    style = document.createElement('style');
-    style.setAttribute('id', 'selection');
-  }
-
-  style.innerHTML = `.${selectionClassName} {background: blue}`;
-
-  document.head.appendChild(style);
-
-  textNodeAndStartIndexes.forEach((textAndStartIndex) => {
-    const { node, startIndex } = textAndStartIndex;
-
-    const range = new Range();
-    range.setStart(node, startIndex);
-    range.setEnd(node, startIndex + text.length);
-
-    const wrapper = document.createElement('span');
-    wrapper.classList.add(selectionClassName);
-
-    range.surroundContents(wrapper);
-  });
+  FreezeScroll.disable();
 };
 
 export default highlightText;

@@ -43,11 +43,13 @@ const Options = ({
       return textContentItemsCombined;
     };
 
-    getTextCombined()
-      .then((textContentItemsCombined) => {
-        setWords(extractWords(textContentItemsCombined));
-      })
-      .catch(console.log);
+    if (pdf) {
+      getTextCombined()
+        .then((textContentItemsCombined) => {
+          setWords(extractWords(textContentItemsCombined));
+        })
+        .catch(console.log);
+    }
   }, [pdf]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
