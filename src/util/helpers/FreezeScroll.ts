@@ -1,10 +1,10 @@
 class FreezeScroll {
-  static enable = () => {
+  static freezeScroll = () => {
     document.body.style.height = '100%';
     document.body.style.overflow = 'hidden';
   };
 
-  static disable = () => {
+  static unfreezeScroll = () => {
     document.body.style.height = 'auto';
     document.body.style.overflow = 'auto';
   };

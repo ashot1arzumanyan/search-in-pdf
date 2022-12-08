@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Options from './components/Options';
 import optionsExternal from './util/constants/options';
 import Uploader from './components/Uploader';
+import { selectorsContainerId, viewerContainerId } from './util/constants/base';
 
 pdflib.GlobalWorkerOptions.workerSrc = '../build/webpack/pdf.worker.bundle.js';
 
@@ -18,7 +19,7 @@ const App = () => {
   useEffect(() => {
     if (file) {
       const render = async () => {
-        const container = document.getElementById('viewerContainer') as HTMLDivElement;
+        const container = document.getElementById(viewerContainerId) as HTMLDivElement;
 
         const pdfDocument = await pdflib.getDocument(file).promise;
 
@@ -55,7 +56,7 @@ const App = () => {
   return (
     <div className="main">
       <div className="main__preview">
-        <div id="viewerContainer">
+        <div id={viewerContainerId}>
           <div id="viewer" className="pdfViewer" />
         </div>
         {!file && <Uploader onLoaded={setFile} />}
@@ -67,7 +68,7 @@ const App = () => {
         pdf={pdf}
       />
       <div className="main__selectorsContainer">
-        <div id="selectors" />
+        <div id={selectorsContainerId} />
       </div>
     </div>
   );

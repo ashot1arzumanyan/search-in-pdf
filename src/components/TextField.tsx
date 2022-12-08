@@ -1,6 +1,9 @@
-import { ChangeEventHandler, memo, useRef } from 'react';
+import { ChangeEventHandler, memo } from 'react';
+
 import getDatalistId from '../util/helpers/getDatalistId';
-import highlightText from '../util/helpers/highlightText';
+import SearchController from '../util/helpers/SearchController';
+import selectController from '../util/helpers/SelectController';
+
 import DataList from './DataList';
 
 const MemoizedDataList = memo(DataList);
@@ -22,15 +25,22 @@ const TextField = ({
   words,
   saved,
 }: ComponentProps) => {
-  const selectedObj = useRef({ selected: false });
-
   const listId = getDatalistId(id);
 
   const handleMouseEnter = () => {
-    if (!saved || !value || selectedObj.current.selected) return;
-    selectedObj.current.selected = true;
+    if (!saved) return;
+    const valueLowerCased = value.toLowerCase();
 
-    highlightText(value.toLowerCase());
+    if (selectController.texts.has(valueLowerCased)) {
+      selectController.enable(value.toLowerCase());
+    } else {
+      const coords = SearchController.coordinates(valueLowerCased);
+      selectController.createSelectors(coords.rects, coords.text);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    selectController.disable(value.toLowerCase());
   };
 
   return (
@@ -44,6 +54,7 @@ const TextField = ({
         value={value}
         onChange={onChange}
         onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       />
       <MemoizedDataList
         listId={listId}
