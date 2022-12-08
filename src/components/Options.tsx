@@ -7,6 +7,7 @@ import {
 
 import { Option, TextContentItem } from '../types/types';
 import extractWords from '../util/helpers/extractWords';
+import Modal from './Modal';
 
 import TextField from './TextField';
 
@@ -25,6 +26,7 @@ const Options = ({
 }: ComponentProps) => {
   const [saved, setSaved] = useState(false);
   const [words, setWords] = useState<Set<string>>(new Set());
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const getTextCombined = async () => {
@@ -65,8 +67,13 @@ const Options = ({
     onChange(newOptions);
   };
 
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
   const handleSave = () => {
     setSaved(true);
+    setModalOpen(true);
   };
 
   return (
@@ -87,6 +94,28 @@ const Options = ({
           Save
         </button>
       </div>
+      <Modal open={modalOpen} closeModal={handleModalClose}>
+        <div>
+          <h2 className="mt-0 text--center">
+            Your selection
+          </h2>
+          <div>
+            {options.map((option) => (
+              <div key={option.id}>
+                <p>
+                  <span className="text--bold">
+                    {option.name}
+                    {': '}
+                  </span>
+                  <span>
+                    {option.value}
+                  </span>
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
