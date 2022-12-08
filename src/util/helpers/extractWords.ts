@@ -7,7 +7,10 @@ const extractWords = (textContentItems: TextContentItem[]) => {
     const { str } = textContentItems[i];
     const itemWords = str.split(' ');
     for (let ii = 0; ii < itemWords.length; ii += 1) {
-      words.add(itemWords[ii].replace(/[,;:.`-]$/, ''));
+      const word = itemWords[ii];
+      if (word.length > 1) {
+        words.add(word.toLowerCase().replace(/[,;:.`-]$/, ''));
+      }
     }
   }
   return words;
