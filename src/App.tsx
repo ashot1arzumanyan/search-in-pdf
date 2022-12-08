@@ -66,6 +66,9 @@ const App = () => {
         onChange={setOptions}
         pdf={pdf}
       />
+      <div className="main__selectorsContainer">
+        <div id="selectors" />
+      </div>
     </div>
   );
 };
