@@ -95,7 +95,26 @@ const Options = ({
         </button>
       </div>
       <Modal open={modalOpen} closeModal={handleModalClose}>
-        <div>Content</div>
+        <div>
+          <h2 className="mt-0 text--center">
+            Your selection
+          </h2>
+          <div>
+            {options.map((option) => (
+              <div key={option.id}>
+                <p>
+                  <span className="text--bold">
+                    {option.name}
+                    {': '}
+                  </span>
+                  <span>
+                    {option.value}
+                  </span>
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </Modal>
     </div>
   );
