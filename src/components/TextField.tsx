@@ -1,8 +1,14 @@
-import { ChangeEventHandler, memo } from 'react';
+import {
+  ChangeEvent,
+  ChangeEventHandler,
+  memo,
+  useMemo,
+} from 'react';
 
 import getDatalistId from '../util/helpers/getDatalistId';
 import SearchController from '../util/helpers/SearchController';
-import selectController from '../util/helpers/SelectController';
+import { selectControllerInstance as selectController } from '../util/helpers/SelectController';
+import debounce from '../util/helpers/debounce';
 
 import DataList from './DataList';
 
@@ -14,7 +20,6 @@ interface ComponentProps {
   id: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
   words: Set<string>;
-  saved: boolean;
 }
 
 const TextField = ({
@@ -23,24 +28,42 @@ const TextField = ({
   id,
   onChange,
   words,
-  saved,
 }: ComponentProps) => {
-  const listId = getDatalistId(id);
+  const listId = useMemo(() => getDatalistId(id), [id]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value.toLowerCase();
+
+    selectController.destroy(id);
+    if (text) {
+      const highlight = () => {
+        const coords = SearchController.coordinates(text);
+        selectController.createSelectors(coords.rects, coords.text, id);
+      };
+
+      debounce.handle(highlight);
+    } else {
+      debounce.clear();
+      selectController.destroy(id);
+    }
+    onChange(e);
+  };
 
   const handleMouseEnter = () => {
-    if (!saved) return;
     const valueLowerCased = value.toLowerCase();
 
-    if (selectController.texts.has(valueLowerCased)) {
-      selectController.enable(value.toLowerCase());
-    } else {
-      const coords = SearchController.coordinates(valueLowerCased);
-      selectController.createSelectors(coords.rects, coords.text);
+    if (valueLowerCased) {
+      if (selectController.selections.getSelectionByText(valueLowerCased)) {
+        selectController.enable(id);
+      } else {
+        const coords = SearchController.coordinates(valueLowerCased);
+        selectController.createSelectors(coords.rects, coords.text, id);
+      }
     }
   };
 
   const handleMouseLeave = () => {
-    selectController.disable(value.toLowerCase());
+    selectController.disable(id);
   };
 
   return (
@@ -52,7 +75,7 @@ const TextField = ({
         list={listId}
         name={id}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       />
