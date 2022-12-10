@@ -68,7 +68,7 @@ const App = () => {
         pdf={pdf}
       />
       <div className="main__selectorsContainer">
-        <div id={selectorsContainerId} />
+        <div id={selectorsContainerId} className="selectors" />
       </div>
     </div>
   );

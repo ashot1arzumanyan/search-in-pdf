@@ -1,18 +1,20 @@
 import { Rect } from '../../types/types';
 import { selectorsContainerId } from '../constants/base';
+import Selections from './Selections';
 
 class SelectController {
   selectorsContainerId: string;
 
-  texts: Set<string>;
+  selections: Selections;
 
-  enabled?: string;
+  enabledIndex: number;
 
   styleElementId: string;
 
   constructor() {
     this.selectorsContainerId = selectorsContainerId;
-    this.texts = new Set();
+    this.selections = new Selections();
+    this.enabledIndex = -1;
     this.styleElementId = 'selected';
   }
 
@@ -22,81 +24,93 @@ class SelectController {
     return `selector--${text}`;
   }
 
-  getDisabledStyle(text: string) {
-    return `.selector--${text} { display: none; }`;
+  getSelectionContainer(name: string) {
+    const id = this.getSelectorClassName(name);
+    return document.getElementById(id);
   }
 
-  getEnabledStyle(text: string) {
-    return `.selector--${text} { display: block; }`;
-  }
-
-  private createSelector(rect: Rect, text: string) {
+  private createSelector(rect: Rect, text?: string) {
     const span = document.createElement('span');
 
     span.classList.add('selector');
-    span.classList.add(`selector--${text}`);
+    if (text) {
+      span.classList.add(`selector--${text}`);
+    }
 
     span.style.top = `${rect.top}px`;
     span.style.left = `${rect.left}px`;
     span.style.width = `${rect.width}px`;
     span.style.height = `${rect.height}px`;
 
-    document.querySelector(`#${SelectController.selectorsContainerId}`).appendChild(span);
+    return span;
   }
 
-  createSelectors(rects: Rect[], text?: string) {
-    if (this.texts.has(text)) {
-      return text;
+  createSelectors(rects: Rect[], text: string, name: string) {
+    if (this.selections.hasName(name).found) {
+      return;
     }
 
-    if (this.enabled !== text) {
-      this.enable(text);
-    }
+    this.enable(name);
+
+    const container = document.createElement('div');
+    container.id = this.getSelectorClassName(name);
+
+    const selectorsContainer = document.getElementById(this.selectorsContainerId);
+    if (selectorsContainer) selectorsContainer.appendChild(container);
 
     rects.forEach((coord) => {
-      this.createSelector(coord, text);
+      const span = this.createSelector(coord);
+      container.appendChild(span);
     });
 
-    const uniqueString = text || Date.now().toString();
-
-    this.texts.add(text);
-    this.enabled = text;
-
-    return uniqueString;
+    this.selections.add({ rects, text, name });
   }
 
-  destroy() {
+  destroyAll() {
     document.getElementById(this.selectorsContainerId).innerHTML = '';
+    this.selections.removeAll();
   }
 
-  enable(text: string) {
-    const className = this.getSelectorClassName(text);
-    let style = document.getElementById(className);
-    const styleInnerText = this.getEnabledStyle(text);
-
-    if (!style) {
-      style = document.createElement('style');
-      style.setAttribute('type', 'text/css');
-      style.id = className;
-      style.innerText = styleInnerText;
-      document.head.appendChild(style);
-    } else {
-      style.innerText = styleInnerText;
+  destroy(name: string) {
+    const container = this.getSelectionContainer(name);
+    if (container) {
+      container.remove();
     }
-    this.enabled = text;
+    this.selections.remove(name);
   }
 
-  disable(text: string) {
-    const className = this.getSelectorClassName(text);
-    const style = document.getElementById(className);
+  enable(name: string) {
+    const { index, found } = this.selections.hasName(name);
+    this.enabledIndex = index;
 
-    if (style) {
-      style.innerText = this.getDisabledStyle(text);
+    if (found) {
+      const container = this.getSelectionContainer(name);
+
+      if (container) {
+        container.classList.remove('disabled');
+        container.classList.add('enabled');
+      }
     }
-    if (this.enabled === text) {
-      this.enabled = '';
+  }
+
+  disable(name: string) {
+    const { found } = this.selections.hasName(name);
+
+    if (found) {
+      const container = this.getSelectionContainer(name);
+
+      if (container) {
+        container.classList.add('disabled');
+        container.classList.remove('enabled');
+      }
     }
+
+    this.enabledIndex = -1;
   }
 }
 
-export default new SelectController();
+const selectControllerInstance = new SelectController();
+
+export { selectControllerInstance };
+
+export default SelectController;
