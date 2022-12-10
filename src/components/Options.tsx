@@ -7,6 +7,7 @@ import {
 
 import { Option, TextContentItem } from '../types/types';
 import extractWords from '../util/helpers/extractWords';
+import { selectControllerInstance } from '../util/helpers/SelectController';
 import Modal from './Modal';
 
 import TextField from './TextField';
@@ -24,7 +25,6 @@ const Options = ({
   onChange,
   pdf,
 }: ComponentProps) => {
-  const [saved, setSaved] = useState(false);
   const [words, setWords] = useState<Set<string>>(new Set());
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -72,8 +72,8 @@ const Options = ({
   };
 
   const handleSave = () => {
-    setSaved(true);
     setModalOpen(true);
+    selectControllerInstance.destroyAll(); // REPLACE ME
   };
 
   return (
@@ -86,7 +86,6 @@ const Options = ({
           value={option.value}
           onChange={handleChange}
           words={words}
-          saved={saved}
         />
       ))}
       <div className="options__buttonContainer">

@@ -42,8 +42,22 @@ html, body {
   }
 }
 
-.selector {
-  position: absolute;
-  background-color: red;
-  opacity: 0.5;
+.selectors {
+  & .enabled {
+    & .selector {
+      display: block;
+    }
+  }
+
+  & .disabled {
+    & .selector {
+      display: none;
+    }
+  }
+
+  & .selector {
+    position: absolute;
+    background-color: red;
+    opacity: 0.5;
+  }
 }
