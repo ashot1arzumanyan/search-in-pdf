@@ -37,7 +37,8 @@ const TextField = ({
     selectController.destroy(id);
     if (text) {
       const highlight = () => {
-        const coords = SearchController.coordinates(text);
+        const searchController = new SearchController(text);
+        const coords = searchController.coordinates();
         selectController.createSelectors(coords.rects, coords.text, id);
       };
 
@@ -56,7 +57,8 @@ const TextField = ({
       if (selectController.selections.getSelectionByText(valueLowerCased)) {
         selectController.enable(id);
       } else {
-        const coords = SearchController.coordinates(valueLowerCased);
+        const searchController = new SearchController(valueLowerCased);
+        const coords = searchController.coordinates();
         selectController.createSelectors(coords.rects, coords.text, id);
       }
     }
