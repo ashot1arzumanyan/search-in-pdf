@@ -2,15 +2,55 @@ import { Coords } from '../../types/types';
 import { viewerContainerId } from '../constants/base';
 import FreezeScroll from './FreezeScroll';
 
-class SearchController extends FreezeScroll {
+class SearchController {
+  text: string;
+
+  private coords: Coords;
+
   static containerId = viewerContainerId;
 
-  static coordinates = (text: string) => {
-    this.freezeScroll();
+  constructor(text: string) {
+    this.text = text;
+    this.coords = { text, rects: [] };
+  }
 
-    const coords: Coords = { text, rects: [] };
+  getStartIndexes(content: string) {
+    const startIndexes: number[] = [];
+    let startIndex = 0;
+    while (startIndex >= 0) {
+      const position = startIndexes.length > 0
+        ? startIndexes[startIndexes.length - 1] + this.text.length
+        : undefined;
 
-    const container = document.getElementById(this.containerId);
+      const index = content.indexOf(this.text, position);
+      if (index >= 0) startIndexes.push(index);
+      startIndex = index;
+    }
+
+    return startIndexes;
+  }
+
+  getRect(node: Node, startIndex: number) {
+    const range = new Range();
+    range.setStart(node, startIndex);
+    range.setEnd(node, startIndex + this.text.length);
+
+    const clientRect = range.getBoundingClientRect();
+
+    const rect = {
+      top: clientRect.top + window.scrollY,
+      left: clientRect.left + window.scrollX,
+      width: clientRect.width,
+      height: clientRect.height,
+    };
+
+    return rect;
+  }
+
+  coordinates() {
+    FreezeScroll.freezeScroll();
+
+    const container = document.getElementById(SearchController.containerId);
     const pages = container.querySelectorAll('.page');
 
     pages.forEach((page) => {
@@ -25,31 +65,22 @@ class SearchController extends FreezeScroll {
       let currentNode = walker.nextNode();
 
       while (currentNode) {
-        const startIndex = currentNode.textContent.toLowerCase().indexOf(text);
-        if (startIndex >= 0) {
-          const range = new Range();
-          range.setStart(currentNode, startIndex);
-          range.setEnd(currentNode, startIndex + text.length);
+        const startIndexes = this.getStartIndexes(currentNode.textContent);
 
-          const clientRect = range.getBoundingClientRect();
-
-          const rect = {
-            top: clientRect.top + window.scrollY,
-            left: clientRect.left + window.scrollX,
-            width: clientRect.width,
-            height: clientRect.height,
-          };
-
-          coords.rects.push(rect);
+        for (let i = 0; i < startIndexes.length; i += 1) {
+          const index = startIndexes[i];
+          const rect = this.getRect(currentNode, index);
+          this.coords.rects.push(rect);
         }
+
         currentNode = walker.nextNode();
       }
     });
 
-    this.unfreezeScroll();
+    FreezeScroll.unfreezeScroll();
 
-    return coords;
-  };
+    return this.coords;
+  }
 }
 
 export default SearchController;
