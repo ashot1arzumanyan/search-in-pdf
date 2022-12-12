@@ -20,5 +20,3 @@ To see it in action you can follow the link https://ashot1arzumanyan.github.io/s
 
 Used PDF.js (https://mozilla.github.io/pdf.js) library for converting PDF file to HTML.
 <br/><br/>
-
-> **_NOTE:_**  You can see text highlighted after clicking the Save button.
