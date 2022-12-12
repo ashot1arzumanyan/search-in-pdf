@@ -5,6 +5,39 @@ import FreezeScroll from './FreezeScroll';
 class SearchController extends FreezeScroll {
   static containerId = viewerContainerId;
 
+  static getStartIndexes = (content: string, text: string) => {
+    const startIndexes: number[] = [];
+    let startIndex = 0;
+    while (startIndex >= 0) {
+      const position = startIndexes.length > 0
+        ? startIndexes[startIndexes.length - 1] + text.length
+        : undefined;
+
+      const index = content.indexOf(text, position);
+      if (index >= 0) startIndexes.push(index);
+      startIndex = index;
+    }
+
+    return startIndexes;
+  };
+
+  static getRect = (node: Node, text: string, startIndex: number) => {
+    const range = new Range();
+    range.setStart(node, startIndex);
+    range.setEnd(node, startIndex + text.length);
+
+    const clientRect = range.getBoundingClientRect();
+
+    const rect = {
+      top: clientRect.top + window.scrollY,
+      left: clientRect.left + window.scrollX,
+      width: clientRect.width,
+      height: clientRect.height,
+    };
+
+    return rect;
+  };
+
   static coordinates = (text: string) => {
     this.freezeScroll();
 
@@ -25,23 +58,14 @@ class SearchController extends FreezeScroll {
       let currentNode = walker.nextNode();
 
       while (currentNode) {
-        const startIndex = currentNode.textContent.toLowerCase().indexOf(text);
-        if (startIndex >= 0) {
-          const range = new Range();
-          range.setStart(currentNode, startIndex);
-          range.setEnd(currentNode, startIndex + text.length);
+        const startIndexes = this.getStartIndexes(currentNode.textContent, text);
 
-          const clientRect = range.getBoundingClientRect();
-
-          const rect = {
-            top: clientRect.top + window.scrollY,
-            left: clientRect.left + window.scrollX,
-            width: clientRect.width,
-            height: clientRect.height,
-          };
-
+        for (let i = 0; i < startIndexes.length; i += 1) {
+          const index = startIndexes[i];
+          const rect = this.getRect(currentNode, text, index);
           coords.rects.push(rect);
         }
+
         currentNode = walker.nextNode();
       }
     });
